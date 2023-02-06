@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _speed;
     private Rigidbody _rb;
 
+
     [Header("jump")]
     [SerializeField] private float _jumpForce;
     [SerializeField] private KeyCode _jumpKey;
@@ -47,22 +48,21 @@ public class PlayerMovement : MonoBehaviour
 
     private void RotateEyes()
     {
-        float yMouse = Input.GetAxis("Mouse Y") * _sensitivity * Time.deltaTime;
+        float yMouse = Input.GetAxisRaw("Mouse Y") * _sensitivity * Time.deltaTime;
         _camAngle -= yMouse;
         _camAngle = Mathf.Clamp(_camAngle, _camLimitMin, _camLimitMax);
         _eyes.localRotation = Quaternion.Euler(_camAngle, 0, 0);
     }
-
     private void RotateBody()
     {
-        float xMouse = Input.GetAxis("Mouse X") * _sensitivity * Time.deltaTime;
+        float xMouse = Input.GetAxisRaw("Mouse X") * _sensitivity * Time.deltaTime;
         transform.Rotate(Vector3.up * xMouse);
     }
 
     private void Move()
     {
-        float xDir = Input.GetAxis("Horizontal");
-        float zDir = Input.GetAxis("Vertical");
+        float xDir = Input.GetAxisRaw("Horizontal");
+        float zDir = Input.GetAxisRaw("Vertical");
 
         Vector3 dir = transform.right * xDir + transform.forward * zDir;
 
@@ -77,7 +77,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void Jump(float jumpForce) 
+    private void Jump(float jumpForce)
     {
         _rb.velocity = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
         _rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
