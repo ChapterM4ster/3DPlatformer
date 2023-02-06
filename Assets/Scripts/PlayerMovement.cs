@@ -4,51 +4,89 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("PlayerMovement")]
-    public float movementSpeed = 6f;
-    public CharacterController controller;
+    [Header("camera")]
+    [SerializeField] private Transform _eyes;
+    [SerializeField] private float _sensitivity;
+    [Range(-90f, 0f)]
+    [SerializeField] private float _camLimitMin;
+    [Range(0f, 90f)]
+    [SerializeField] private float _camLimitMax;
+    private float _camAngle = 0.0f;
 
-    [Header("gravity")]
-    public float gravity = -9.81f;
+    [Header("movement")]
+    [SerializeField] private float _speed;
+    private Rigidbody _rb;
 
-    Vector3 velocity;
+    [Header("jump")]
+    [SerializeField] private float _jumpForce;
+    [SerializeField] private KeyCode _jumpKey;
 
-    [Header("GroundCheck")]
-    public Transform groundCheck;
-    public float groundDistance = 0.4f;
-    public LayerMask groundmask;
-
-    bool isGrounded;
-
-    void Start()
+    private void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
+        _rb = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        UserInputMovement();
-    }
+        RotateEyes();
+        RotateBody();
 
-    void UserInputMovement()
-    {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundmask);
-
-        if (isGrounded && velocity.y < 0)
+        if (Input.GetKeyDown(_jumpKey))
         {
-            velocity.y = 0f;
+            TryJump();
         }
 
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
 
-        Vector3 move =transform.right * x + transform.forward * z;
-
-        controller.Move(move * movementSpeed * Time.deltaTime);
-
-        velocity.y += gravity * Time.deltaTime;
-
-        controller.Move(velocity * Time.deltaTime);
     }
+
+    private void FixedUpdate()
+    {
+        Move();
+    }
+
+    private void RotateEyes()
+    {
+        float yMouse = Input.GetAxis("Mouse Y") * _sensitivity * Time.deltaTime;
+        _camAngle -= yMouse;
+        _camAngle = Mathf.Clamp(_camAngle, _camLimitMin, _camLimitMax);
+        _eyes.localRotation = Quaternion.Euler(_camAngle, 0, 0);
+    }
+
+    private void RotateBody()
+    {
+        float xMouse = Input.GetAxis("Mouse X") * _sensitivity * Time.deltaTime;
+        transform.Rotate(Vector3.up * xMouse);
+    }
+
+    private void Move()
+    {
+        float xDir = Input.GetAxis("Horizontal");
+        float zDir = Input.GetAxis("Vertical");
+
+        Vector3 dir = transform.right * xDir + transform.forward * zDir;
+
+        _rb.velocity = new Vector3(0, _rb.velocity.y, 0) + dir.normalized * _speed;
+    }
+
+    private void TryJump()
+    {
+        if (IsGrounded())
+        {
+            Jump(_jumpForce);
+        }
+    }
+
+    private void Jump(float jumpForce) 
+    {
+        _rb.velocity = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
+        _rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+    }
+
+    private bool IsGrounded()
+    {
+        RaycastHit hit;
+        return (Physics.Raycast(transform.position, -transform.up, out hit, 1.1f));
+    }
+
 }
