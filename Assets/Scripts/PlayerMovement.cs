@@ -17,10 +17,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _speed;
     private Rigidbody _rb;
 
-
     [Header("jump")]
     [SerializeField] private float _jumpForce;
     [SerializeField] private KeyCode _jumpKey;
+
+    [Header("scripts")]
+    public Grapple _grapple;
 
     private void Start()
     {
@@ -38,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
             TryJump();
         }
 
+        SlowDownTime();
 
     }
 
@@ -59,14 +62,24 @@ public class PlayerMovement : MonoBehaviour
         transform.Rotate(Vector3.up * xMouse);
     }
 
-    private void Move()
+    public void Move()
     {
-        float xDir = Input.GetAxisRaw("Horizontal");
-        float zDir = Input.GetAxisRaw("Vertical");
 
-        Vector3 dir = transform.right * xDir + transform.forward * zDir;
+        if (_grapple.grappling == true)
+        {
 
-        _rb.velocity = new Vector3(0, _rb.velocity.y, 0) + dir.normalized * _speed;
+        }
+        else if (_grapple.grappling == false)
+        {
+            float xDir = Input.GetAxisRaw("Horizontal");
+            float zDir = Input.GetAxisRaw("Vertical");
+
+            Vector3 dir = transform.right * xDir + transform.forward * zDir;
+
+            _rb.velocity = new Vector3(0, _rb.velocity.y, 0) + dir.normalized * _speed;
+        }
+
+        
     }
 
     private void TryJump()
@@ -89,4 +102,16 @@ public class PlayerMovement : MonoBehaviour
         return (Physics.Raycast(transform.position, -transform.up, out hit, 1.1f));
     }
 
+
+    private void SlowDownTime()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            Time.timeScale = 0.5f;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
+    }
 }
