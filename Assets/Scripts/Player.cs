@@ -52,7 +52,16 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-
+            if (inHandItem != null)
+            {
+                inHandItem.transform.SetParent(null);
+                inHandItem = null;
+                Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.isKinematic = false;
+                }
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.F))
@@ -80,7 +89,7 @@ public class Player : MonoBehaviour
                     if (rb != null)
                     {
                         rb.isKinematic = true;
-                    }
+                    } 
                     return;
                 }
 
