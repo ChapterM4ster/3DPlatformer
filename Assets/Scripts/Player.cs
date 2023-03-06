@@ -19,9 +19,11 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private Transform pickUpParent;
+    private Transform pickUpGun;
 
     [SerializeField]
     private GameObject inHandItem;
+    private GameObject GrappleGun;
 
     private RaycastHit hit;
 
@@ -54,6 +56,7 @@ public class Player : MonoBehaviour
         {
             if (inHandItem != null)
             {
+                Debug.Log("dropped the item you were holding");
                 inHandItem.transform.SetParent(null);
                 inHandItem = null;
                 Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
@@ -75,6 +78,19 @@ public class Player : MonoBehaviour
                     inHandItem.transform.position = Vector3.zero;
                     inHandItem.transform.rotation = Quaternion.identity;
                     inHandItem.transform.SetParent(pickUpParent.transform, false);
+                    if (rb != null)
+                    {
+                        rb.isKinematic = true;
+                    }
+                    return;
+                }
+
+                if (hit.collider.GetComponent<Tool>())
+                {
+                    GrappleGun = hit.collider.gameObject;
+                    GrappleGun.transform.position = Vector3.zero;
+                    GrappleGun.transform.rotation = Quaternion.identity;
+                    GrappleGun.transform.SetParent(pickUpGun.transform, false);
                     if (rb != null)
                     {
                         rb.isKinematic = true;
