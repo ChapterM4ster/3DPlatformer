@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -13,8 +14,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _camLimitMax;
     private float _camAngle = 0.0f;
 
-    [Header("movement")]
+    [Header("scriptableobject")]
     [SerializeField] private float _speed;
+    [SerializeField] public int _health;
+    [SerializeField] private EntityStats _entityStats;
     private Rigidbody _rb;
 
     [Header("jump")]
@@ -28,6 +31,9 @@ public class PlayerMovement : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         _rb = GetComponent<Rigidbody>();
+
+        _speed = _entityStats._MS;
+        _health = _entityStats._HP;
     }
 
     private void Update()
@@ -42,8 +48,17 @@ public class PlayerMovement : MonoBehaviour
 
         SlowDownTime();
 
+        if (_health <= 0)
+        {
+            ReloadLevel();
+        }
+
     }
 
+    public void ReloadLevel()
+    {
+        SceneManager.LoadScene(0);
+    }
     private void FixedUpdate()
     {
         Move();
@@ -112,6 +127,14 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             Time.timeScale = 1;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "OutOfBounds")
+        {
+            _health = _health - 20;
         }
     }
 }
