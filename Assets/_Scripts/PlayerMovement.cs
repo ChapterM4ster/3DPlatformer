@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
@@ -13,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     [Range(0f, 90f)]
     [SerializeField] private float _camLimitMax;
     private float _camAngle = 0.0f;
+    [SerializeField] public GameObject gameOverText;
 
     [Header("scriptableobject")]
     [SerializeField] private float _speed;
@@ -135,6 +137,14 @@ public class PlayerMovement : MonoBehaviour
         if (other.tag == "OutOfBounds")
         {
             _health = _health - 20;
+        }
+
+        if (other.tag == "Victory")
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Time.timeScale = 0;
+            gameOverText.gameObject.SetActive(true);
+            
         }
     }
 }
