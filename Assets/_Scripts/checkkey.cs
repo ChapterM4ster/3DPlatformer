@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Audio;
 using UnityEngine;
 
 
@@ -12,6 +13,8 @@ public class checkkey : MonoBehaviour
     private GameObject door;
     [SerializeField]
     private GameObject keyItem;
+    [SerializeField]
+    private AudioSource UnlockingGate;
     
 
     // Start is called before the first frame update
@@ -30,6 +33,7 @@ public class checkkey : MonoBehaviour
     {
         if (other.tag == "Key")
         {
+            UnlockingGate.Play();
             GameObject.Destroy(door);
             GameObject.Destroy(keyItem);
 
